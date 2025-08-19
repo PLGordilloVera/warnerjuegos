@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warner Bienes Raíces Arcade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for colors */
+        :root {
+            --color-dark-blue: #000028; /* Dark blue, a bit lighter than almost black */
+            --color-accent-yellow: #FFD700; /* Logo yellow (Gold) */
+            --color-medium-blue: #000080; /* Medium dark blue for text/button shadow */
+            --color-light-blue: #0000b3; /* Lighter blue for hover effect */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Press Start 2P', cursive;
+            color: var(--color-accent-yellow);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: black;
+        }
+
+        .arcade-screen {
+            position: relative;
+            width: 90vw;
+            max-width: 1000px;
+            height: 70vh;
+            max-height: 700px;
+            border: 10px solid var(--color-accent-yellow);
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.7), inset 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            background-color: var(--color-dark-blue);
+            box-sizing: border-box;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 1;
+
+            /* Flexbox to center and vertically arrange content */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .under-construction-text {
+            z-index: 10;
+            color: var(--color-accent-yellow);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2em;
+            text-shadow: 4px 4px 0px var(--color-medium-blue);
+            /* Blinking animation */
+            animation: blink 1s infinite alternate;
+            /* Ensures text does not break into multiple lines */
+            white-space: nowrap; 
+            margin-bottom: 80px; /* Increased space below the text to push the button down */
+        }
+
+        /* Definition of the blinking animation */
+        @keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .return-button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1em;
+            color: var(--color-accent-yellow);
+            background-color: var(--color-medium-blue);
+            border: 3px solid var(--color-accent-yellow);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+            z-index: 1;
+            text-decoration: none; /* Remove underline from the link */
+        }
+
+        .return-button:hover {
+            background-color: var(--color-light-blue); /* Adjustment: using a lighter blue for hover */
+        }
+
+        .return-button:active {
+            transform: translateY(2px);
+        }
+
+        @media (max-width: 768px) {
+            .arcade-screen {
+                width: 95vw;
+                height: 80vh;
+            }
+            .under-construction-text {
+                font-size: 1.2em; /* Smaller font size for mobile */
+                margin-bottom: 40px; /* Adjusted margin for mobile */
+            }
+            .return-button {
+                font-size: 0.8em;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="arcade-screen" id="arcadeScreen">
+        <div class="under-construction-text">EN CONSTRUCCION...</div>
+        <a href="index.html" class="return-button">VOLVER</a>
+    </div>
+
+    <script>
+        const arcadeScreen = document.getElementById('arcadeScreen');
+
+        window.addEventListener('load', () => {
+            arcadeScreen.style.opacity = 1;
+        });
+    </script>
+</body>
+</html>
