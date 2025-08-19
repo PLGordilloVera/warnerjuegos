@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warner Bienes Raíces Arcade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Variables CSS para los colores */
+        :root {
+            --color-dark-blue: #00004d; /* Azul muy oscuro */
+            --color-medium-blue: #000080; /* Azul medio oscuro */
+            --color-light-blue: #0000b3; /* Azul más claro */
+            --color-accent-yellow: #FFD700; /* Amarillo del logo (Gold) */
+            --pixel-size: 2px; /* Tamaño base del "pixel" */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Press Start 2P', cursive;
+            color: var(--color-accent-yellow);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: black;
+        }
+
+        .arcade-screen {
+            position: relative;
+            width: 90vw;
+            max-width: 1000px;
+            height: 70vh;
+            max-height: 700px;
+            border: 10px solid var(--color-accent-yellow);
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.7), inset 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            /* ALINEACIÓN CLAVE: Cambiado para alinear los elementos desde el inicio (arriba) */
+            justify-content: flex-start;
+            align-items: center;
+            background-color: var(--color-dark-blue);
+            box-sizing: border-box;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 1;
+        }
+
+        .background-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(calc(var(--pixel-size) * 10), 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(calc(var(--pixel-size) * 10), 1fr));
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .grid-cell {
+            background-color: var(--color-light-blue);
+            animation: pulse 5s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.15; }
+            50% { opacity: 0.05; }
+            100% { opacity: 0.15; }
+        }
+
+        .logo-container {
+            /* Ajustado el padding-bottom para acercar el logo al título */
+            padding-bottom: 10px; 
+            z-index: 999;
+        }
+
+        .pixel-logo {
+            /* AUMENTADO EL TAMAÑO DEL LOGO */
+            width: 150px; 
+            height: 150px;
+            background-color: var(--color-accent-yellow);
+            mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="44" fill="none" stroke="white" stroke-width="8"/><polygon points="50,15 55,25 55,80 45,80 45,25" fill="white"/><polygon points="30,40 40,30 40,80 30,80" fill="white"/><polygon points="60,30 70,40 70,80 60,80" fill="white"/></svg>');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="44" fill="none" stroke="white" stroke-width="8"/><polygon points="50,15 55,25 55,80 45,80 45,25" fill="white"/><polygon points="30,40 40,30 40,80 30,80" fill="white"/><polygon points="60,30 70,40 70,80 60,80" fill="white"/></svg>');
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            position: relative;
+            box-shadow: 0 0 25px var(--color-accent-yellow);
+        }
+
+        .pixel-logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, var(--color-dark-blue) 0 calc(var(--pixel-size) * 2), transparent 0 calc(var(--pixel-size) * 4)),
+                        repeating-linear-gradient(90deg, var(--color-dark-blue) 0 calc(var(--pixel-size) * 2), transparent 0 calc(var(--pixel-size) * 4));
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .game-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0px var(--color-medium-blue);
+            letter-spacing: 5px;
+            z-index: 1;
+        }
+
+        .screen-container {
+            display: flex;
+            flex-direction: column;
+            /* Ajustado el padding-top para bajar un poco el contenido desde el borde superior */
+            padding-top: 50px; 
+            justify-content: flex-start; /* Asegurarse que se alinee con arcade-screen */
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+        
+        /* Estilo para el enlace del botón */
+        .menu-link {
+            text-decoration: none; /* Elimina el subrayado del enlace */
+        }
+
+        .menu-button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1em;
+            color: var(--color-accent-yellow);
+            background-color: var(--color-medium-blue);
+            border: 3px solid var(--color-accent-yellow);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+
+        .menu-button:hover {
+            background-color: var(--color-light-blue);
+        }
+
+        .menu-button:active {
+            transform: translateY(2px);
+        }
+
+        /* Nuevo estilo para el texto "SELECCIONAR JUEGO" */
+        .game-selector-text {
+            font-family: 'Press Start 2P', cursive;
+            color: white; /* Color blanco como solicitado */
+            /* Letra mucho más pequeña */
+            font-size: 0.7em; 
+            margin-bottom: 10px; /* Espacio entre el texto y el botón */
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .game-selector-placeholder {
+            width: 80%;
+            /* Recuadro un poco más corto, ajustado de 250px a 220px */
+            height: 220px; 
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 5px solid var(--color-accent-yellow);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column; /* Cambiado a columna para el texto y el botón */
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            color: var(--color-accent-yellow);
+            box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.5);
+            margin-bottom: 20px;
+            /* Se ha añadido un margen superior para empujar el selector hacia abajo */
+            margin-top: 40px; 
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .arcade-screen {
+                width: 95vw;
+                height: 80vh;
+            }
+            .game-title {
+                font-size: 1.2em;
+            }
+            .pixel-logo {
+                /* Ajustado el tamaño del logo para pantallas pequeñas */
+                width: 100px; 
+                height: 100px;
+            }
+            .menu-button {
+                font-size: 0.8em;
+                padding: 6px 12px;
+            }
+            .game-selector-placeholder {
+                /* Ajuste de altura para pantallas pequeñas, de 200px a 170px */
+                height: 170px; 
+                font-size: 1em;
+                /* Margen superior ajustado para pantallas pequeñas */
+                margin-top: 20px; 
+            }
+            .screen-container {
+                /* Ajustado el padding-top para pantallas pequeñas */
+                padding-top: 30px; 
+            }
+            .game-selector-text {
+                font-size: 0.6em; /* Ajustado el tamaño de fuente para pantallas pequeñas */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="arcade-screen" id="arcadeScreen">
+        <div class="background-grid" id="backgroundGrid"></div>
+
+        <div class="screen-container" id="menuScreen">
+            <div class="logo-container">
+                <div class="pixel-logo"></div>
+            </div>
+            <h1 class="game-title">WARNER BIENES RAÍCES</h1>
+            <div class="game-selector-placeholder">
+                <!-- Nuevo div para el texto "SELECCIONAR JUEGO" -->
+                <div class="game-selector-text">SELECCIONAR JUEGO</div>
+                <a href="liga-warner.html" class="menu-link">
+                    <!-- El botón original "LIGA WARNER" -->
+                    <button class="menu-button">LIGA WARNER</button>
+                </a>
+                <!-- Nuevo botón "COPA WARNER" -->
+                <a href="copa-warner.html" class="menu-link">
+                    <button class="menu-button">COPA WARNER</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const grid = document.getElementById('backgroundGrid');
+        const arcadeScreen = document.getElementById('arcadeScreen');
+
+        function createGrid() {
+            grid.innerHTML = '';
+            const cellWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--pixel-size')) * 10;
+            const screenWidth = grid.offsetWidth;
+            const screenHeight = grid.offsetHeight;
+            const cols = Math.ceil(screenWidth / cellWidth);
+            const rows = Math.ceil(screenHeight / cellWidth);
+
+            for (let i = 0; i < cols * rows; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('grid-cell');
+                cell.style.animationDelay = `${Math.random() * 5}s`;
+                grid.appendChild(cell);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            createGrid();
+            arcadeScreen.style.opacity = 1;
+        });
+
+        window.addEventListener('resize', createGrid);
+    </script>
+</body>
+</html>
