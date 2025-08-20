@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* ==========================================
-           FUENTES
-           ========================================== */
+          FUENTES
+          ========================================== */
         /* Importa una fuente tipo arcade para el título y el botón */
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         .font-arcade {
@@ -22,8 +22,8 @@
         }
 
         /* ==========================================
-           ESTILOS GENERALES DEL BODY
-           ========================================== */
+          ESTILOS GENERALES DEL BODY
+          ========================================== */
         body {
             background-color: #000 !important; /* Fondo negro sólido para toda la página, forzado con !important */
             color: white; /* Color del texto */
@@ -37,15 +37,15 @@
         }
 
         /* ==========================================
-           CONTENEDORES DE PISTA
-           ========================================== */
+          CONTENEDORES DE PISTA
+          ========================================== */
         /* Contenedor principal para una pista */
         .track-container {
             display: flex;
             flex-direction: column;
             align-items: center; /* Centrar las pistas si no ocupan todo el ancho */
             width: 100%; /* Ocupa el 100% del contenedor padre */
-            margin-bottom: 20px; /* Espacio entre pistas */
+            margin-bottom: 40px; /* AUMENTADO: Espacio entre pistas */
         }
 
         /* La ventana de visualización de la pista (fixed viewport) */
@@ -54,15 +54,30 @@
             position: relative;
             overflow: hidden; /* Esto es clave para el efecto de scroll */
             width: 100%; /* ¡Ajustado para ocupar todo el ancho de la consola! */
-            max-width: 600px; /* Ancho máximo para cada pista */
+            max-width: 800px; /* MODIFICADO: Ancho máximo para cada pista */
             height: 100px; /* Altura fija para la sección de la pista */
             background-color: #333; /* Fondo base de la pista */
             border: 2px solid #555; /* Borde sutil para la pista */
         }
+        
+        /* ==========================================
+          NUEVO: PANEL DE DATOS DE LA CARRERA
+          ========================================== */
+        .race-data-display {
+            width: 100%;
+            max-width: 800px; /* MODIFICADO: Ancho máximo para el panel */
+            background-color: #111; /* Negro un poco más claro que el fondo */
+            border: 2px solid #555;
+            border-bottom: none; /* Se une visualmente con la pista */
+            border-radius: 8px 8px 0 0; /* Bordes redondeados solo arriba */
+            padding: 8px 12px; /* MODIFICADO: Altura reducida */
+            margin-bottom: -1px; /* Solapamiento ligero para unir bordes */
+            color: #eee;
+        }
 
         /* ==========================================
-           AUTOS
-           ========================================== */
+          AUTOS
+          ========================================== */
         .car {
             width: 20px; /* Ancho del auto */
             height: 10px; /* Alto del auto */
@@ -76,6 +91,29 @@
             /* top y left se establecerán en JS o en clases específicas */
         }
 
+        /* MODIFICADO: Ruedas de los autos */
+        .car::before,
+        .car::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: #222; /* Color de las ruedas */
+            border-radius: 50%;
+            bottom: -3px; /* Posición vertical de las ruedas */
+            z-index: -1; /* Detrás del chasis del auto */
+            border: 1px solid #444;
+        }
+
+        .car::before {
+            left: 2px; /* Rueda delantera */
+        }
+
+        .car::after {
+            right: 2px; /* Rueda trasera */
+        }
+
+
         /* Posiciones verticales por carril (ahora SIEMPRE sobre la pista) */
         .car.car-A {
             top: 30%; /* carril superior */
@@ -87,8 +125,8 @@
         }
 
         /* ==========================================
-           LÍNEA DE LARGADA + DIVISORIAS
-           ========================================== */
+          LÍNEA DE LARGADA + DIVISORIAS
+          ========================================== */
         .start-area {
             position: absolute;
             top: 0;
@@ -148,8 +186,8 @@
         }
 
         /* ==========================================
-           FRANJAS ROJAS/BLANCAS LATERALES (bordes de la pista)
-           ========================================== */
+          FRANJAS ROJAS/BLANCAS LATERALES (bordes de la pista)
+          ========================================== */
         .track-stripe {
             position: absolute;
             height: 5px; /* Grosor de la línea */
@@ -167,8 +205,8 @@
         .track-stripe.bottom-border { bottom: 0; }
 
         /* ==========================================
-           CONTENEDOR PRINCIPAL (marco césped arcade)
-           ========================================== */
+          CONTENEDOR PRINCIPAL (marco césped arcade)
+          ========================================== */
         .main-container-wrapper {
             border: 4px solid #ffffff; /* Borde blanco */
             box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.4); /* Sombra blanca suave */
@@ -198,14 +236,14 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 600px; /* Igual que el ancho máximo de las pistas */
+            max-width: 800px; /* MODIFICADO: Ancho máximo de la consola */
             margin: auto;
             position: relative; /* Para sombras y semáforo */
         }
 
         /* ==========================================
-           SEMÁFORO
-           ========================================== */
+          SEMÁFORO
+          ========================================== */
         #traffic-light {
             background-color: #333; /* Fondo oscuro del semáforo */
             border: 2px solid #555;
@@ -243,6 +281,21 @@
             <!-- Plantilla para una pista de carrera (se clonará con JS) -->
             <template id="track-template">
                 <div class="track-container">
+                    <!-- Panel de datos de la carrera -->
+                    <div class="race-data-display">
+                        <!-- MODIFICADO: Se quitó el nombre de la pareja -->
+                        <div class="flex justify-between items-center text-xs">
+                            <div class="text-left">
+                                <span class="agent-a-name block">AGENTE A</span>
+                                <span class="agent-b-name block mt-1">AGENTE B</span>
+                            </div>
+                            <div class="text-right font-digital text-lg">
+                                <span class="agent-a-score block text-red-400">0</span>
+                                <span class="agent-b-score block mt-1 text-blue-400">0</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="race-track-viewport"> <!-- La ventana de visualización fija de la pista -->
                         <!-- Franjas rojas y blancas -->
                         <div class="track-stripe top-border"></div>
@@ -291,30 +344,18 @@
         ];
 
         const MAX_SCORE_FOR_VISUAL = 600; 
-        // La posición X donde la línea de largada se verá en el viewport (100px desde la izquierda)
         const START_LINE_VISUAL_X = 100; 
-        // Pequeño offset para que el auto con 0 puntos esté un poco antes de la línea de largada (25px)
         const CAR_START_OFFSET_FROM_LINE = 25; 
-
-        // La posición inicial X (borde izquierdo) de los autos dentro del viewport.
-        // Se calcula para que el auto esté 25px antes de la línea de largada visual.
         const CAR_BASE_VIEWPORT_X = START_LINE_VISUAL_X - CAR_START_OFFSET_FROM_LINE; // 100 - 25 = 75px
         
-        // El rango que el auto puede "avanzar" en la pista, desde su posición base hasta el final (considerando su ancho).
-        // Max ancho de pista (600px) - ancho del auto (20px) - posición inicial del auto (75px) = 505px
-        const CAR_LEAD_RANGE = (600 - 20) - CAR_BASE_VIEWPORT_X; 
+        // MODIFICADO: Rango de movimiento del auto ajustado al nuevo ancho
+        const CAR_LEAD_RANGE = (800 - 20) - CAR_BASE_VIEWPORT_X; 
 
         const LANE_DIVIDER_PATTERN_WIDTH = 40; 
         const FINAL_TRACK_SCROLL_SPEED = 5; 
         const INITIAL_TRACK_SCROLL_SPEED = 0.1;
         const ACCELERATION_RATE = 0.05;
-        
-        // La posición inicial (borde izquierdo) del start-area (70px de ancho).
-        // Se calcula para que su línea punteada (borde derecho) coincida con START_LINE_VISUAL_X.
-        // START_LINE_VISUAL_X (100px) - Ancho del start-area (70px) = 30px
         const ZERO_POINT_CAR_STATIC_X_START_AREA = START_LINE_VISUAL_X - 70; 
-
-        // Duración de la salida desde la largada hasta la posición por puntaje
         const LAUNCH_DURATION_MS = 2000; // 2 segundos para que se note la aceleración
 
         // ==========================================
@@ -364,6 +405,16 @@
             // Crear dinámicamente las pistas a partir de la plantilla
             for (let i = 0; i < staticData.length; i++) {
                 const trackClone = trackTemplate.content.cloneNode(true);
+                const data = staticData[i];
+
+                // --- Rellenar el panel de datos ---
+                const dataDisplay = trackClone.querySelector('.race-data-display');
+                // MODIFICADO: Se quitó la línea que rellenaba el nombre de la pareja
+                dataDisplay.querySelector('.agent-a-name').textContent = data.agente1Nombre;
+                dataDisplay.querySelector('.agent-b-name').textContent = data.agente2Nombre;
+                dataDisplay.querySelector('.agent-a-score').textContent = data.agente1Puntaje;
+                dataDisplay.querySelector('.agent-b-score').textContent = data.agente2Puntaje;
+
                 tracksContainer.appendChild(trackClone);
                 
                 // Inicializar estados para la nueva pista
@@ -443,7 +494,7 @@
 
                 if (progress < 1) {
                     requestAnimationFrame(moveCars);
-        }
+                }
             }
 
             requestAnimationFrame(moveCars);
@@ -555,7 +606,7 @@
         document.addEventListener('DOMContentLoaded', initializeTracksAndAnimations);
 
         // En un resize: si la carrera NO comenzó aún, mantener autos en la largada;
-        // si ya comenzó, recalcular posiciones según puntaje para que se adapten al ancho fijo de viewport (600px)
+        // si ya comenzó, recalcular posiciones según puntaje para que se adapten al ancho fijo de viewport (800px)
         window.addEventListener('resize', () => {
             if (!raceStarted) {
                 setCarsAtStartLine();
@@ -566,4 +617,3 @@
     </script>
 </body>
 </html>
-
