@@ -36,6 +36,38 @@
             font-family: 'Inter', sans-serif; /* Fuente principal */
         }
 
+        /* Estilos de la pantalla de carga */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        #loading-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2rem;
+            /* Color amarillo para el texto de carga para que destaque */
+            color: #FFD700; 
+            text-shadow: 2px 2px 0px rgba(255, 215, 0, 0.5);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+
         /* ==========================================
           CONTENEDORES DE PISTA
           ========================================== */
@@ -54,7 +86,6 @@
             position: relative;
             overflow: hidden; /* Esto es clave para el efecto de scroll */
             width: 100%; /* Ocupa el 100% del contenedor padre */
-            max-width: 800px; /* Ancho máximo para cada pista (ahora ocupa todo el contenedor principal) */
             height: 100px; /* Altura fija para la sección de la pista */
             background-color: #333; /* Fondo base de la pista */
             border: 2px solid #555; /* Borde sutil para la pista */
@@ -65,7 +96,7 @@
           ========================================== */
         .race-data-display {
             width: 100%;
-            max-width: 400px; /* Ancho máximo para el panel (aún más estrecho) */
+            max-width: 400px; /* Ancho máximo para el panel (se mantiene estrecho como pediste) */
             background-color: #111; /* Negro un poco más claro que el fondo */
             border: 2px solid #555;
             border-bottom: none; /* Se une visualmente con la pista */
@@ -82,9 +113,9 @@
             --car: #ff3b30; /* valor por defecto, se sobrescribe por clase */
             position: absolute;
             width: 26px;      /* Ancho del auto */
-            height: 14px;      /* Alto del auto */
+            height: 14px;     /* Alto del auto */
             transform: translateY(-50%); /* Centrado vertical fino */
-            transition: none;      /* Movimiento por JS */
+            transition: none;     /* Movimiento por JS */
             z-index: 5;
             border-radius: 6px; 
             border: none; 
@@ -123,11 +154,11 @@
         /* Colores y posiciones verticales por carril (siempre sobre la pista) */
         .car.car-A {
             --car: #ff3b30; /* rojo */
-            top: 30%;        /* carril superior */
+            top: 30%;       /* carril superior */
         }
         .car.car-B {
             --car: #0a84ff; /* azul */
-            top: 70%;        /* carril inferior */
+            top: 70%;       /* carril inferior */
         }
 
         /* ==========================================
@@ -239,8 +270,8 @@
             background-size: 20px 20px;
             background-repeat: repeat;
 
-            padding-top: 100px; /* Suficiente padding para el cartel y un margen */
-            padding-bottom: 20px; /* Pequeño margen desde el borde inferior de la consola */
+            /* <<< CORRECCIÓN: Se elimina el padding horizontal para que las pistas ocupen todo el ancho */
+            padding: 100px 0 20px 0; 
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -285,6 +316,7 @@
             justify-content: flex-end; /* Asegura que las pistas dentro de este contenedor estén al final */
             display: flex; /* Asegura que este contenedor use flexbox */
             flex-direction: column; /* Organiza las pistas en columna */
+            width: 100%; /* Asegura que ocupe todo el ancho del padding del padre */
         }
 
         /* ==========================================
@@ -322,6 +354,10 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4 font-inter flex-col">
+
+<div id="loading-screen">
+    <span id="loading-text">CARGANDO COPA WARNER...</span>
+</div>
 
     <!-- Contenedor principal con bordes blancos brillantes -->
     <div class="main-container-wrapper">
@@ -388,38 +424,28 @@
         // ==========================================
         // CONFIGURACIÓN DE APPS SCRIPT
         // ==========================================
-        // Esta es la URL de tu aplicación web de Google Apps Script.
-        // Google Apps Script es quien se encarga de leer tu hoja de cálculo
-        // y aplicar la lógica de puntuación que definiste en tu `doGet` función.
-        //
-        // 🚨🚨 ¡IMPORTANTE! ¡VERIFICA ESTA LÍNEA! 🚨🚨
-        // Asegúrate de que tu URL esté SIEMPRE entre comillas simples o dobles.
-        // Si la pegas sin comillas, causará un error de sintaxis.
-        //
         const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby6vF8ldTSW-9GbniTnJ14S-CnmzcEmf5qRKWIw-UCq1gagDRnc3GCWMIEflvGk00E/exec'; 
-        // ¡Por favor, revisa que no haya ningún cambio en las comillas al pegar tu URL!
-        // ==========================================
-
-
+        
         // ==========================================
         // DATOS Y CONSTANTES
         // ==========================================
-        let competitionData = []; // Esta variable se llenará con los datos del Apps Script
+        let competitionData = []; 
 
         const MAX_SCORE_FOR_VISUAL = 600; 
         const START_LINE_VISUAL_X = 100; 
         const CAR_START_OFFSET_FROM_LINE = 25; 
         const CAR_BASE_VIEWPORT_X = START_LINE_VISUAL_X - CAR_START_OFFSET_FROM_LINE; // 100 - 25 = 75px
         
-        // El rango de movimiento del auto se ajusta al ancho del viewport de la pista (800px)
-        const CAR_LEAD_RANGE = (800 - 20) - CAR_BASE_VIEWPORT_X; 
+        // El rango de movimiento del auto se ajusta al ancho del viewport de la pista
+        // Se recalcula dinámicamente en `setCarsToScorePositions`
+        let CAR_LEAD_RANGE = 700; 
 
         const LANE_DIVIDER_PATTERN_WIDTH = 40; 
         const FINAL_TRACK_SCROLL_SPEED = 5; 
         const INITIAL_TRACK_SCROLL_SPEED = 0.1;
         const ACCELERATION_RATE = 0.05;
         const ZERO_POINT_CAR_STATIC_X_START_AREA = START_LINE_VISUAL_X - 70; 
-        const LAUNCH_DURATION_MS = 2000; // 2 segundos para que se note la aceleración
+        const LAUNCH_DURATION_MS = 2000;
 
         // ==========================================
         // ESTADO MUTABLE
@@ -430,7 +456,7 @@
         let startAreaDisappeared = [];
         let trackCurrentSpeeds = []; 
         const trackElements = []; 
-        let trackStripeScrollOffsets = []; // offsets de las franjas laterales
+        let trackStripeScrollOffsets = [];
 
         // Semáforo
         let trafficLightsElement;
@@ -438,10 +464,10 @@
         let greenLightElement;
         let lightSequenceIndex = 0;
         let lightInterval;
-        const LIGHT_DELAY_MS = 600; // Retraso entre cada luz
+        const LIGHT_DELAY_MS = 600;
 
         // Flag de carrera
-        let raceStarted = false; // Antes del verde = false. Al largar = true.
+        let raceStarted = false;
 
         // ==========================================
         // REFERENCIAS DOM
@@ -454,7 +480,6 @@
         // ==========================================
         async function fetchCompetitionData() {
             try {
-                // Realiza la petición GET a tu aplicación web de Apps Script
                 const response = await fetch(APPS_SCRIPT_WEB_APP_URL);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -464,12 +489,13 @@
                 return data;
             } catch (error) {
                 console.error("Error al cargar datos desde Apps Script:", error);
-                // Retornar datos estáticos de respaldo en caso de error
-                // Esto asegura que el juego funcione incluso si la URL de Apps Script falla o no está configurada
-                // Aquí usamos los datos estáticos que tenías originalmente
+                // Retornar datos de respaldo en caso de error
+                return [
+                    { agente1Nombre: "Agente A1", agente2Nombre: "Agente B1", agente1Puntaje: 350, agente2Puntaje: 500 },
+                    { agente1Nombre: "Agente A2", agente2Nombre: "Agente B2", agente1Puntaje: 550, agente2Puntaje: 200 },
+                ];
             }
         }
-
 
         // ==========================================
         // INICIALIZACIÓN
@@ -478,7 +504,16 @@
             // Cargar los datos antes de inicializar las pistas
             competitionData = await fetchCompetitionData();
 
-            // Limpiar pistas y animaciones existentes si se llama por un redimensionamiento o reinicio
+            // Ocultar la pantalla de carga
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 1000); // 1000ms = 1s, debe coincidir con la duración de la transición en CSS
+            }
+
+            // Limpiar pistas y animaciones existentes
             animationFrameIds.forEach(cancelAnimationFrame);
             animationFrameIds = [];
             laneDividerScrollOffsets = [];
@@ -487,41 +522,34 @@
             trackCurrentSpeeds = []; 
             trackStripeScrollOffsets = []; 
 
-            tracksContainer.innerHTML = ''; // Limpiar el contenedor de pistas
-            trackElements.length = 0; // Limpiar el array de elementos de pista
+            tracksContainer.innerHTML = ''; 
+            trackElements.length = 0;
 
             // Crear dinámicamente las pistas a partir de la plantilla
             for (let i = 0; i < competitionData.length; i++) {
                 const trackClone = trackTemplate.content.cloneNode(true);
                 const data = competitionData[i];
 
-                // --- Rellenar el panel de datos ---
                 const dataDisplay = trackClone.querySelector('.race-data-display');
                 dataDisplay.querySelector('.agent-a-name').textContent = data.agente1Nombre;
                 dataDisplay.querySelector('.agent-b-name').textContent = data.agente2Nombre;
-                // Mostrar guiones en lugar de puntajes al inicio
                 dataDisplay.querySelector('.agent-a-score').textContent = "-"; 
                 dataDisplay.querySelector('.agent-b-score').textContent = "-";
 
                 tracksContainer.appendChild(trackClone);
                 
-                // Inicializar estados para la nueva pista
                 laneDividerScrollOffsets.push(0); 
                 startAreaCurrentX.push(ZERO_POINT_CAR_STATIC_X_START_AREA); 
                 startAreaDisappeared.push(false);
-                trackCurrentSpeeds.push(INITIAL_TRACK_SCROLL_SPEED); // Velocidad inicial lenta
+                trackCurrentSpeeds.push(INITIAL_TRACK_SCROLL_SPEED);
                 trackStripeScrollOffsets.push(0);
             }
 
-            // Obtener referencias a los elementos de las pistas recién creadas
             document.querySelectorAll('.track-container').forEach(trackEl => {
                 trackElements.push(trackEl);
             });
 
-            // Colocar autos EN LA LARGADA (todos iguales) antes del verde
             setCarsAtStartLine(); 
-
-            // Iniciar la secuencia del semáforo
             startTrafficLightSequence();
         }
 
@@ -541,34 +569,43 @@
             });
         }
 
-        // Recalcula la posición final según puntaje (por si la ventana cambia)
         function setCarsToScorePositions() {
             trackElements.forEach((trackEl, i) => {
                 const carA = trackEl.querySelector('.car-A');
                 const carB = trackEl.querySelector('.car-B');
-                const pairData = competitionData[i]; // Usar competitionData
+                const pairData = competitionData[i];
                 if (!pairData) return;
+
+                const viewportWidth = trackEl.querySelector('.race-track-viewport').offsetWidth;
+                const carWidth = carA.offsetWidth;
+                CAR_LEAD_RANGE = viewportWidth - CAR_BASE_VIEWPORT_X - carWidth - 10; // 10px de margen al final
 
                 const carAFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente1Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
                 const carBFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente2Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
 
-                carA.style.left = `${carAFinalX}px`;
-                carB.style.left = `${carBFinalX}px`;
+                carA.style.left = `${Math.min(carAFinalX, viewportWidth - carWidth)}px`;
+                carB.style.left = `${Math.min(carBFinalX, viewportWidth - carWidth)}px`;
 
                 carA.style.display = 'block';
                 carB.style.display = 'block';
             });
         }
 
-        // Movimiento desde la largada hasta la posición real por puntaje
-        function animateCarsToFinalPositions(pairData, carA, carB) {
+        function animateCarsToFinalPositions(trackIndex) {
+            const trackEl = trackElements[trackIndex];
+            const carA = trackEl.querySelector('.car-A');
+            const carB = trackEl.querySelector('.car-B');
+            const pairData = competitionData[trackIndex];
+
+            const viewportWidth = trackEl.querySelector('.race-track-viewport').offsetWidth;
+            const carWidth = carA.offsetWidth;
+            CAR_LEAD_RANGE = viewportWidth - CAR_BASE_VIEWPORT_X - carWidth - 10;
+
             const carAFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente1Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
             const carBFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente2Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
 
             const startTime = performance.now();
-            const duration = LAUNCH_DURATION_MS; // ms
-
-            // Easing (aceleración suave): easeOutCubic
+            const duration = LAUNCH_DURATION_MS;
             const ease = (t) => 1 - Math.pow(1 - t, 3);
 
             function moveCars(now) {
@@ -576,60 +613,53 @@
                 const progress = Math.min(elapsed / duration, 1);
                 const eased = ease(progress);
 
-                // Interpolación desde la largada hasta la posición final por puntos
-                carA.style.left = `${CAR_BASE_VIEWPORT_X + (carAFinalX - CAR_BASE_VIEWPORT_X) * eased}px`;
-                carB.style.left = `${CAR_BASE_VIEWPORT_X + (carBFinalX - CAR_BASE_VIEWPORT_X) * eased}px`;
+                const currentAX = CAR_BASE_VIEWPORT_X + (carAFinalX - CAR_BASE_VIEWPORT_X) * eased;
+                const currentBX = CAR_BASE_VIEWPORT_X + (carBFinalX - CAR_BASE_VIEWPORT_X) * eased;
+
+                carA.style.left = `${Math.min(currentAX, viewportWidth - carWidth)}px`;
+                carB.style.left = `${Math.min(currentBX, viewportWidth - carWidth)}px`;
 
                 if (progress < 1) {
                     requestAnimationFrame(moveCars);
                 }
             }
-
             requestAnimationFrame(moveCars);
-        }         
+        }        
 
         // ==========================================
         // BUCLE DE ANIMACIÓN DE LA PISTA
         // ==========================================
-        function animateRaceLoop(trackIndex, raceTrackViewport, carA, carB, startArea, laneDividerVisual, topStripe, bottomStripe, pairData) {
-            if (!pairData) return; // No animar si no hay datos
+        function animateRaceLoop(trackIndex) {
+            const trackEl = trackElements[trackIndex];
+            const startArea = trackEl.querySelector('.start-area');
+            const laneDividerVisual = trackEl.querySelector('.lane-divider-visual');
+            const topStripe = trackEl.querySelector('.track-stripe.top-border');
+            const bottomStripe = trackEl.querySelector('.track-stripe.bottom-border');
 
             function gameLoop() {
-                // Aumentar la velocidad de la pista progresivamente hasta la velocidad final deseada
                 if (trackCurrentSpeeds[trackIndex] < FINAL_TRACK_SCROLL_SPEED) {
                     trackCurrentSpeeds[trackIndex] = Math.min(trackCurrentSpeeds[trackIndex] + ACCELERATION_RATE, FINAL_TRACK_SCROLL_SPEED);
                 }
 
-                // Actualizar la posición de scroll de la línea divisoria (background)
                 laneDividerScrollOffsets[trackIndex] = (laneDividerScrollOffsets[trackIndex] - trackCurrentSpeeds[trackIndex]) % LANE_DIVIDER_PATTERN_WIDTH;
                 laneDividerVisual.style.backgroundPositionX = `${laneDividerScrollOffsets[trackIndex]}px`;
 
-                // Actualizar la posición de scroll de las franjas laterales (background)
                 trackStripeScrollOffsets[trackIndex] = (trackStripeScrollOffsets[trackIndex] - trackCurrentSpeeds[trackIndex]) % LANE_DIVIDER_PATTERN_WIDTH;
                 topStripe.style.backgroundPositionX = `${trackStripeScrollOffsets[trackIndex]}px`;
                 bottomStripe.style.backgroundPositionX = `${trackStripeScrollOffsets[trackIndex]}px`;
 
-                // Actualizar la posición de la startArea (se mueve y no regresa)
                 if (!startAreaDisappeared[trackIndex]) {
                     startAreaCurrentX[trackIndex] -= trackCurrentSpeeds[trackIndex];
                     startArea.style.left = `${startAreaCurrentX[trackIndex]}px`;
 
-                    // Si la startArea se fue completamente de la pantalla, la ocultamos y marcamos como desaparecida
                     if (startAreaCurrentX[trackIndex] + startArea.offsetWidth < 0) {
                         startArea.style.display = 'none';
                         startAreaDisappeared[trackIndex] = true;
                     }
                 }
 
-                // Asegurar que ambos autos siempre estén visibles (su X la gestiona otra lógica)
-                carA.style.display = 'block';
-                carB.style.display = 'block';
-
-                // Solicitar el siguiente frame de animación
                 animationFrameIds[trackIndex] = requestAnimationFrame(gameLoop);
             }
-
-            // Iniciar el bucle de animación
             animationFrameIds[trackIndex] = requestAnimationFrame(gameLoop);
         }
 
@@ -641,9 +671,8 @@
             redLightsElements = trafficLightsElement.querySelectorAll('.red-light');
             greenLightElement = trafficLightsElement.querySelector('.green-light');
 
-            trafficLightsElement.classList.remove('hidden'); // Mostrar semáforo
+            trafficLightsElement.classList.remove('hidden');
 
-            // Reset de luces
             redLightsElements.forEach(light => light.classList.remove('red-on'));
             greenLightElement.classList.remove('green-on'); 
 
@@ -651,47 +680,32 @@
 
             lightInterval = setInterval(() => {
                 if (lightSequenceIndex < redLightsElements.length) {
-                    // Encender rojas secuencialmente
                     redLightsElements[lightSequenceIndex].classList.add('red-on');
                     lightSequenceIndex++;
                 } else if (lightSequenceIndex === redLightsElements.length) {
-                    // Todas las rojas encendidas, ahora apagarlas y encender la verde
                     redLightsElements.forEach(light => light.classList.remove('red-on'));
                     greenLightElement.classList.add('green-on');
-                    lightSequenceIndex++; // señal de que la verde está encendida
+                    lightSequenceIndex++; 
                     
-                    // Iniciar la carrera tras un breve delay para que se vea la verde
                     setTimeout(() => {
-                        trafficLightsElement.classList.add('hidden'); // Ocultar semáforo
-                        clearInterval(lightInterval); // Detener la secuencia
+                        trafficLightsElement.classList.add('hidden');
+                        clearInterval(lightInterval);
 
-                        raceStarted = true; // ¡Largamos!
+                        raceStarted = true;
                         
-                        // Mostrar los puntajes reales después de que la carrera inicie
                         trackElements.forEach((trackEl, i) => {
-                            const data = competitionData[i]; // Usar competitionData
+                            const data = competitionData[i];
                             if (data) {
                                 trackEl.querySelector('.agent-a-score').textContent = data.agente1Puntaje;
                                 trackEl.querySelector('.agent-b-score').textContent = data.agente2Puntaje;
                             }
                         });
 
-                        // Animación de salida + scroll de pista para todas las pistas
                         trackElements.forEach((trackEl, i) => {
-                            const carA = trackEl.querySelector('.car-A');
-                            const carB = trackEl.querySelector('.car-B');
-                            const startArea = trackEl.querySelector('.start-area');
-                            const laneDividerVisual = trackEl.querySelector('.lane-divider-visual'); 
-                            const raceTrackViewport = trackEl.querySelector('.race-track-viewport');
-                            const topStripe = trackEl.querySelector('.track-stripe.top-border');
-                            const bottomStripe = trackEl.querySelector('.track-stripe.bottom-border');
-                            
-                            // 1) Mover autos desde la largada hasta su posición final por puntaje
-                            animateCarsToFinalPositions(competitionData[i], carA, carB);
-                            // 2) Empezar el scroll de la pista
-                            animateRaceLoop(i, raceTrackViewport, carA, carB, startArea, laneDividerVisual, topStripe, bottomStripe, competitionData[i]);
+                            animateCarsToFinalPositions(i);
+                            animateRaceLoop(i);
                         });
-                    }, LIGHT_DELAY_MS * 1.5); // Un poco más de tiempo para ver la verde
+                    }, LIGHT_DELAY_MS * 1.5);
                 }
             }, LIGHT_DELAY_MS);
         }
@@ -699,11 +713,8 @@
         // ==========================================
         // EVENTOS
         // ==========================================
-        // Llamar a initializeTracksAndAnimations cuando el DOM esté cargado
         document.addEventListener('DOMContentLoaded', initializeTracksAndAnimations);
 
-        // En un resize: si la carrera NO comenzó aún, mantener autos en la largada;
-        // si ya comenzó, recalcular posiciones según puntaje para que se adapten al ancho fijo de viewport (800px)
         window.addEventListener('resize', () => {
             if (!raceStarted) {
                 setCarsAtStartLine();
