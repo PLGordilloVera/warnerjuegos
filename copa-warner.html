@@ -15,23 +15,17 @@
         .font-arcade {
             font-family: 'Press Start 2P', cursive;
         }
-        /* Importa una fuente monospace para el estilo de "reloj digital" */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
-        .font-digital {
-            font-family: 'Roboto Mono', monospace;
-        }
 
         /* ==========================================
           ESTILOS GENERALES DEL BODY
           ========================================== */
         body {
-            background-color: #000 !important; /* Fondo negro sólido para toda la página, forzado con !important */
+            background-color: #000 !important; /* Fondo negro sólido */
             color: white; /* Color del texto */
             min-height: 100vh; /* Altura mínima de la pantalla */
             display: flex; /* Flexbox para centrar contenido */
             align-items: center; /* Centrado vertical */
             justify-content: center; /* Centrado horizontal */
-            padding: 4px; /* Espaciado alrededor del contenido */
             flex-direction: column; /* Contenido en columna */
             font-family: 'Inter', sans-serif; /* Fuente principal */
         }
@@ -56,9 +50,8 @@
         #loading-text {
             font-family: 'Press Start 2P', cursive;
             font-size: 2rem;
-            /* Color amarillo para el texto de carga para que destaque */
-            color: #FFD700; 
-            text-shadow: 2px 2px 0px rgba(255, 215, 0, 0.5);
+            color: #FFD700;
+            text-shadow: 2px 2px 0px rgb(206, 22, 22);
             animation: blink 1.5s infinite;
         }
 
@@ -66,183 +59,6 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
-
-
-        /* ==========================================
-          CONTENEDORES DE PISTA
-          ========================================== */
-        /* Contenedor principal para una pista */
-        .track-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Centrar las pistas si no ocupan todo el ancho */
-            width: 100%; /* Ocupa el 100% del contenedor padre */
-            margin-bottom: 20px; /* Espacio entre pistas reducido */
-        }
-
-        /* La ventana de visualización de la pista (fixed viewport) */
-        .race-track-viewport {
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden; /* Esto es clave para el efecto de scroll */
-            width: 100%; /* Ocupa el 100% del contenedor padre */
-            height: 100px; /* Altura fija para la sección de la pista */
-            background-color: #333; /* Fondo base de la pista */
-            border: 2px solid #555; /* Borde sutil para la pista */
-        }
-        
-        /* ==========================================
-          PANEL DE DATOS DE LA CARRERA
-          ========================================== */
-        .race-data-display {
-            width: 100%;
-            max-width: 400px; /* Ancho máximo para el panel (se mantiene estrecho como pediste) */
-            background-color: #111; /* Negro un poco más claro que el fondo */
-            border: 2px solid #555;
-            border-bottom: none; /* Se une visualmente con la pista */
-            border-radius: 8px 8px 0 0; /* Bordes redondeados solo arriba */
-            padding: 2px 12px; /* Altura reducida y padding lateral */
-            margin-bottom: -1px; /* Solapamiento ligero para unir bordes */
-            color: #eee;
-        }
-
-        /* ==========================================
-          AUTOS 100% CSS (con forma)
-          ========================================== */
-        .car {
-            --car: #ff3b30; /* valor por defecto, se sobrescribe por clase */
-            position: absolute;
-            width: 26px;      /* Ancho del auto */
-            height: 14px;     /* Alto del auto */
-            transform: translateY(-50%); /* Centrado vertical fino */
-            transition: none;     /* Movimiento por JS */
-            z-index: 5;
-            border-radius: 6px; 
-            border: none; 
-
-            /* Sprite con capas restaurado a la versión redondeada */
-            background:
-                /* (1) Alerón trasero */
-                linear-gradient(to right, var(--car) 20%, transparent 20% 80%, var(--car) 80%) top 1px left 0 / 100% 2px no-repeat,
-                /* (2) Chasis */
-                linear-gradient(to right, var(--car), var(--car)) top 3px left 0 / 100% 8px no-repeat,
-                /* (3) Cabina oscura (parabrisas) */
-                radial-gradient(45% 70% at 50% 40%, rgba(0,0,0,0.9) 0 55%, transparent 56%) top 0 left 0 / 100% 100% no-repeat,
-                /* (4) Morro (triángulo suavizado con gradiente) */
-                linear-gradient(to right, transparent 0 25%, var(--car) 25% 75%, transparent 75%) bottom 1px left 0 / 100% 3px no-repeat,
-                /* (5) Bordes laterales (líneas de tono más oscuro para dar forma) */
-                linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.35)) left 1px top 3px / 2px 8px no-repeat,
-                linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0.35)) right 1px top 3px / 2px 8px no-repeat;
-        }
-
-        /* RUEDAS (se mantienen en pseudo-elementos para no perder compatibilidad con tu JS) */
-        .car::before,
-        .car::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: radial-gradient(circle at 50% 50%, #111 45%, #222 46% 60%, #111 61% 100%);
-            border-radius: 50%;
-            bottom: -3px; /* Posición vertical de las ruedas */
-            z-index: -1;  /* Detrás del chasis del auto */
-            border: 1px solid #444;
-        }
-        .car::before { left: 2px; }   /* Rueda delantera */
-        .car::after  { right: 2px; }  /* Rueda trasera */
-
-        /* Colores y posiciones verticales por carril (siempre sobre la pista) */
-        .car.car-A {
-            --car: #ff3b30; /* rojo */
-            top: 30%;       /* carril superior */
-        }
-        .car.car-B {
-            --car: #0a84ff; /* azul */
-            top: 70%;       /* carril inferior */
-        }
-
-        /* ==========================================
-          LÍNEA DE LARGADA + DIVISORIAS
-          ========================================== */
-        .start-area {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 70px; /* Ancho para contener el texto y la línea */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 2; /* Por debajo de autos, por encima del fondo */
-            /* left se establecerá y actualizará en JS */
-        }
-
-        .start-text-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            position: relative;
-        }
-
-        .start-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-90deg); /* Centrar y rotar */
-            color: white;
-            font-size: 0.8rem;
-            font-family: 'Press Start 2P', cursive;
-            z-index: 4; /* Texto encima de la línea punteada */
-            white-space: nowrap;
-            text-shadow: 0 0 6px rgba(255, 255, 0, 0.75);
-            letter-spacing: 1px;
-        }
-
-        .start-dotted-line {
-            width: 5px;
-            background: repeating-linear-gradient(to bottom, yellow 0, yellow 5px, transparent 5px, transparent 10px);
-            border-radius: 2px;
-            height: 100%;
-            flex-shrink: 0;
-            opacity: 0.9;
-            margin-left: 5px;
-            z-index: 3; /* Debajo de autos */
-            box-shadow: 0 0 8px rgba(255,255,0,0.25);
-        }
-
-        .lane-divider-visual { /* Línea divisoria horizontal con scroll */
-            position: absolute; /* Para que su background-position-x funcione correctamente */
-            height: 2px; /* Grosor de la línea discontinua */
-            background: repeating-linear-gradient(to right, #ccc 0, #ccc 10px, transparent 10px, transparent 20px); /* Patrón de línea discontinua */
-            border-radius: 1px;
-            opacity: 0.8;
-            top: 50%; /* Centrado verticalmente */
-            transform: translateY(-50%); /* Ajuste fino */
-            left: 0; /* Ocupa todo el ancho */
-            width: 100%; /* El 100% del viewport */
-            z-index: 1; /* Por debajo de autos y largada */
-            /* background-position-x se maneja por JS */
-        }
-
-        /* ==========================================
-          FRANJAS ROJAS/BLANCAS LATERALES (bordes de la pista)
-          ========================================== */
-        .track-stripe {
-            position: absolute;
-            height: 5px; /* Grosor de la línea */
-            width: 100%; /* Ocupa todo el ancho */
-            background: repeating-linear-gradient(to right, 
-                #ff0000 0px,    /* Rojo */
-                #ff0000 15px,   /* Rojo hasta 15px */
-                #ffffff 15px,   /* Blanco empieza en 15px */
-                #ffffff 30px    /* Blanco hasta 30px */
-            );
-            z-index: 0; /* Detrás de todo */
-            background-position-x: 0; /* Se anima por JS */
-        }
-        .track-stripe.top-border { top: 0; }
-        .track-stripe.bottom-border { bottom: 0; }
 
         /* ==========================================
           CONTENEDOR PRINCIPAL (marco césped arcade)
@@ -253,25 +69,24 @@
             
             /* Fondo césped pixelado */
             background-color: #33691E; /* Base de verde más oscuro */
-            background-image: 
-                radial-gradient(circle at 10% 20%, #204E16 1px, transparent 2px), /* Puntos más oscuros */
+            background-image:
+                radial-gradient(circle at 10% 20%, #204E16 1px, transparent 2px),
                 radial-gradient(circle at 50% 70%, #204E16 1px, transparent 2px),
                 radial-gradient(circle at 80% 30%, #204E16 1px, transparent 2px),
                 radial-gradient(circle at 30% 50%, #204E16 1px, transparent 2px),
                 radial-gradient(circle at 60% 10%, #204E16 1px, transparent 2px),
-                radial-gradient(circle at 25% 85%, #4CAF50 1px, transparent 2px), /* Puntos un poco más claros */
+                radial-gradient(circle at 25% 85%, #4CAF50 1px, transparent 2px),
                 radial-gradient(circle at 75% 5%, #4CAF50 1px, transparent 2px),
                 radial-gradient(circle at 5% 40%, #4CAF50 1px, transparent 2px),
                 radial-gradient(circle at 95% 60%, #4CAF50 1px, transparent 2px),
                 radial-gradient(circle at 40% 95%, #4CAF50 1px, transparent 2px),
-                radial-gradient(circle at 15% 5%, rgba(51, 105, 30, 0.7) 2px, transparent 3px), /* Otro tono de verde oscuro */
+                radial-gradient(circle at 15% 5%, rgba(51, 105, 30, 0.7) 2px, transparent 3px),
                 radial-gradient(circle at 70% 90%, rgba(51, 105, 30, 0.7) 2px, transparent 3px),
                 radial-gradient(circle at 5% 50%, rgba(51, 105, 30, 0.7) 2px, transparent 3px);
             background-size: 20px 20px;
             background-repeat: repeat;
 
-            /* <<< CORRECCIÓN: Se elimina el padding horizontal para que las pistas ocupen todo el ancho */
-            padding: 100px 0 20px 0; 
+            padding: 100px 20px 20px 20px;
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -282,18 +97,18 @@
             margin: auto;
             position: relative; /* Para sombras y semáforo, y para posicionar el cartel */
         }
-
+        
         /* ==========================================
           CARTEL "COPA WARNER"
           ========================================== */
-          
+        
         .copa-warner-sign {
             font-family: 'Press Start 2P', cursive;
             font-size: 2.5rem; /* Tamaño de letra grande */
             padding: 8px 30px; /* Altura más estrecha, ancho igual */
             border-radius: 20px; /* Bordes redondeados */
             position: absolute;
-            top: 20px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
@@ -305,436 +120,149 @@
 
             /* Texto estilo arcade con sombra */
             color: #ff0000; /* Rojo principal */
-            text-shadow: 4px 4px 0 #ffff00; /* Sombra amarilla desplazada */
+            text-shadow: 3px 3px 0 #ffff00; /* Sombra amarilla desplazada */
         }
 
-        /* Ajuste para que las pistas se posicionen en la parte inferior de la consola */
-        #tracks-container {
-            margin-top: auto; /* Mantenido para asegurar que empuja hacia el final de la flex-direction column */
-            margin-bottom: 0; /* No es necesario si el padre tiene padding-bottom */
-            flex-grow: 1; /* Permite que el contenedor de pistas crezca y ocupe el espacio restante debajo del cartel */
-            justify-content: flex-end; /* Asegura que las pistas dentro de este contenedor estén al final */
-            display: flex; /* Asegura que este contenedor use flexbox */
-            flex-direction: column; /* Organiza las pistas en columna */
-            width: 100%; /* Asegura que ocupe todo el ancho del padding del padre */
+        /* Estilos de la nueva pantalla de inicio */
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
         }
 
-        /* ==========================================
-          SEMÁFORO
-          ========================================== */
-        #traffic-light {
-            background-color: #333; /* Fondo oscuro del semáforo */
-            border: 2px solid #555;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 6; /* Sobre todo */
-            /* Ajuste de posición para el semáforo, para que no quede fuera de lugar con el nuevo padding-top */
-            top: 50%; /* Centrarlo verticalmente en la consola, no solo en la parte inferior */
-            transform: translate(-50%, -50%);
+        /* Nuevo contenedor para los botones y el título */
+        .start-panel-wrapper {
+            /* Nuevo fondo de asfalto pixelado */
+            background-color: rgba(53, 51, 51, 1);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(60, 60, 60, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 50% 70%, rgba(60, 60, 60, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 80% 30%, rgba(60, 60, 60, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 30% 50%, rgba(60, 60, 60, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 60% 10%, rgba(60, 60, 60, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 25% 85%, rgba(90, 90, 90, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 75% 5%, rgba(90, 90, 90, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 5% 40%, rgba(90, 90, 90, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 95% 60%, rgba(90, 90, 90, 0.7) 1px, transparent 2px),
+                radial-gradient(circle at 40% 95%, rgba(90, 90, 90, 0.7) 1px, transparent 2px);
+            background-size: 20px 20px;
+            background-repeat: repeat;
+
+            padding: 2rem;
+            border-radius: 8px;
+            position: relative;
+            
+            display: flex; /* Nuevo: usar flexbox */
+            flex-direction: column; /* Nuevo: Apilar elementos verticalmente */
+            align-items: center; /* Nuevo: Centrar los elementos */
+            border: none; /* Quitamos el borde para usar el pseudo-elemento */
         }
-        .light-row { margin-bottom: 5px; }
-        .light {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #222; /* Estado apagado */
-            border: 1px solid #555;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-            transition: background-color 0.2s, box-shadow 0.2s; /* Suave */
+        
+        /* Estilo de borde de rayas para los cuatro lados usando un solo pseudo-elemento */
+        .start-panel-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            bottom: -4px;
+            left: -4px;
+            z-index: 1;
+            background-image:
+                /* Borde superior */
+                repeating-linear-gradient(to right, #ff0000 0px, #ff0000 15px, #ffffff 15px, #ffffff 30px),
+                /* Borde derecho */
+                repeating-linear-gradient(to bottom, #ff0000 0px, #ff0000 15px, #ffffff 15px, #ffffff 30px),
+                /* Borde inferior */
+                repeating-linear-gradient(to right, #ff0000 0px, #ff0000 15px, #ffffff 15px, #ffffff 30px),
+                /* Borde izquierdo */
+                repeating-linear-gradient(to bottom, #ff0000 0px, #ff0000 15px, #ffffff 15px, #ffffff 30px);
+            background-position: top, right, bottom, left;
+            background-size: 100% 4px, 4px 100%, 100% 4px, 4px 100%;
+            background-repeat: no-repeat;
         }
-        .light.red-on {
-            background-color: #f00;
-            box-shadow: 0 0 10px #f00, inset 0 0 5px #f00;
+
+        .start-panel-wrapper > * {
+            position: relative;
+            z-index: 2;
         }
-        .light.green-on {
-            background-color: #0f0;
-            box-shadow: 0 0 10px #0f0, inset 0 0 5px #0f0;
+
+        #start-screen h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem; /* Tamaño reducido para subtítulo */
+            text-shadow: 2px 2px 0 #ff0000;
+            color: #ffff00;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .start-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #000; /* Fondo negro */
+            color: #fff; /* Letras blancas */
+            border: 2px solid #fff; /* Borde blanco */
+            padding: 1rem 2rem;
+            margin: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 0, 0.8);
         }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4 font-inter flex-col">
 
-<div id="loading-screen">
-    <span id="loading-text">CARGANDO COPA WARNER...</span>
-</div>
-
-    <!-- Contenedor principal con bordes blancos brillantes -->
+    <div id="loading-screen">
+        <span id="loading-text">CARGANDO COPA WARNER...</span>
+    </div>
+    
+    <!-- Contenedor principal de la consola -->
     <div class="main-container-wrapper">
         <!-- Cartel "COPA WARNER" en la parte superior -->
         <div class="copa-warner-sign">COPA WARNER</div>
-
-        <!-- Contenedor de las pistas de carrera -->
-        <div id="tracks-container" class="w-full flex flex-col items-center">
-            <!-- Plantilla para una pista de carrera (se clonará con JS) -->
-            <template id="track-template">
-                <div class="track-container">
-                    <!-- Panel de datos de la carrera -->
-                    <div class="race-data-display">
-                        <div class="flex justify-between items-center text-sm font-arcade">
-                            <div class="text-left">
-                                <span class="agent-a-name block">AGENTE A</span>
-                                <span class="agent-b-name block mt-1">AGENTE B</span>
-                            </div>
-                            <div class="text-right font-arcade text-xl">
-                                <span class="agent-a-score block text-red-400">0</span>
-                                <span class="agent-b-score block mt-1 text-blue-400">0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="race-track-viewport"> <!-- La ventana de visualización fija de la pista -->
-                        <!-- Franjas rojas y blancas -->
-                        <div class="track-stripe top-border"></div>
-                        <div class="track-stripe bottom-border"></div>
-
-                        <!-- Start Area (elemento que se desplaza y desaparece) -->
-                        <div class="start-area">
-                            <div class="start-text-container">
-                                <span class="start-text font-arcade">START</span>
-                            </div>
-                            <div class="start-dotted-line"></div>
-                        </div>
-
-                        <!-- Línea divisoria (fondo que se desplaza) -->
-                        <div class="lane-divider-visual"></div>
-
-                        <!-- Autos (posición fija en el viewport, simulando avance) -->
-                        <div class="car car-A"></div>
-                        <div class="car car-B"></div>
-                    </div>
-                </div>
-            </template>
-        </div>
-
-        <!-- Semáforo de carrera -->
-        <div id="traffic-light" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col items-center p-4 rounded-lg bg-gray-800 border-2 border-gray-600 hidden">
-            <div class="light-row flex space-x-2 mb-2">
-                <div class="light red-light"></div>
-                <div class="light red-light"></div>
-                <div class="light red-light"></div>
-                <div class="light red-light"></div>
-                <div class="light red-light"></div>
+        <!-- Contenedor principal para la pantalla de inicio -->
+        <div id="start-screen" class="hidden">
+            <!-- Nuevo recuadro para el título y los botones -->
+            <div class="start-panel-wrapper">
+                <h1>SELECCIONAR RONDA</h1>
+                <button id="cuartos-final-btn" class="start-button">CUARTOS DE FINAL</button>
+                <button id="semifinal-btn" class="start-button">SEMIFINAL</button>
             </div>
-            <div class="light green-light"></div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURACIÓN DE APPS SCRIPT
-        // ==========================================
-        const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby6vF8ldTSW-9GbniTnJ14S-CnmzcEmf5qRKWIw-UCq1gagDRnc3GCWMIEflvGk00E/exec'; 
-        
-        // ==========================================
-        // DATOS Y CONSTANTES
-        // ==========================================
-        let competitionData = []; 
-
-        const MAX_SCORE_FOR_VISUAL = 600; 
-        const START_LINE_VISUAL_X = 100; 
-        const CAR_START_OFFSET_FROM_LINE = 25; 
-        const CAR_BASE_VIEWPORT_X = START_LINE_VISUAL_X - CAR_START_OFFSET_FROM_LINE; // 100 - 25 = 75px
-        
-        // El rango de movimiento del auto se ajusta al ancho del viewport de la pista
-        // Se recalcula dinámicamente en `setCarsToScorePositions`
-        let CAR_LEAD_RANGE = 700; 
-
-        const LANE_DIVIDER_PATTERN_WIDTH = 40; 
-        const FINAL_TRACK_SCROLL_SPEED = 5; 
-        const INITIAL_TRACK_SCROLL_SPEED = 0.1;
-        const ACCELERATION_RATE = 0.05;
-        const ZERO_POINT_CAR_STATIC_X_START_AREA = START_LINE_VISUAL_X - 70; 
-        const LAUNCH_DURATION_MS = 2000;
-
-        // ==========================================
-        // ESTADO MUTABLE
-        // ==========================================
-        let animationFrameIds = [];
-        let laneDividerScrollOffsets = [];
-        let startAreaCurrentX = [];
-        let startAreaDisappeared = [];
-        let trackCurrentSpeeds = []; 
-        const trackElements = []; 
-        let trackStripeScrollOffsets = [];
-
-        // Semáforo
-        let trafficLightsElement;
-        let redLightsElements;
-        let greenLightElement;
-        let lightSequenceIndex = 0;
-        let lightInterval;
-        const LIGHT_DELAY_MS = 600;
-
-        // Flag de carrera
-        let raceStarted = false;
-
-        // ==========================================
-        // REFERENCIAS DOM
-        // ==========================================
-        const tracksContainer = document.getElementById('tracks-container');
-        const trackTemplate = document.getElementById('track-template');
-
-        // ==========================================
-        // FUNCIONES DE CARGA DE DATOS
-        // ==========================================
-        async function fetchCompetitionData() {
-            try {
-                const response = await fetch(APPS_SCRIPT_WEB_APP_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log("Datos cargados desde Apps Script:", data);
-                return data;
-            } catch (error) {
-                console.error("Error al cargar datos desde Apps Script:", error);
-                // Retornar datos de respaldo en caso de error
-                return [
-                    { agente1Nombre: "Agente A1", agente2Nombre: "Agente B1", agente1Puntaje: 350, agente2Puntaje: 500 },
-                    { agente1Nombre: "Agente A2", agente2Nombre: "Agente B2", agente1Puntaje: 550, agente2Puntaje: 200 },
-                ];
-            }
-        }
-
-        // ==========================================
-        // INICIALIZACIÓN
-        // ==========================================
-        async function initializeTracksAndAnimations() {
-            // Cargar los datos antes de inicializar las pistas
-            competitionData = await fetchCompetitionData();
-
+        function initializeApp() {
             // Ocultar la pantalla de carga
             const loadingScreen = document.getElementById('loading-screen');
             if (loadingScreen) {
                 loadingScreen.style.opacity = '0';
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
-                }, 1000); // 1000ms = 1s, debe coincidir con la duración de la transición en CSS
+                    document.getElementById('start-screen').classList.remove('hidden'); // Mostrar la pantalla de inicio
+                }, 1000);
             }
 
-            // Limpiar pistas y animaciones existentes
-            animationFrameIds.forEach(cancelAnimationFrame);
-            animationFrameIds = [];
-            laneDividerScrollOffsets = [];
-            startAreaCurrentX = [];
-            startAreaDisappeared = [];
-            trackCurrentSpeeds = []; 
-            trackStripeScrollOffsets = []; 
-
-            tracksContainer.innerHTML = ''; 
-            trackElements.length = 0;
-
-            // Crear dinámicamente las pistas a partir de la plantilla
-            for (let i = 0; i < competitionData.length; i++) {
-                const trackClone = trackTemplate.content.cloneNode(true);
-                const data = competitionData[i];
-
-                const dataDisplay = trackClone.querySelector('.race-data-display');
-                dataDisplay.querySelector('.agent-a-name').textContent = data.agente1Nombre;
-                dataDisplay.querySelector('.agent-b-name').textContent = data.agente2Nombre;
-                dataDisplay.querySelector('.agent-a-score').textContent = "-"; 
-                dataDisplay.querySelector('.agent-b-score').textContent = "-";
-
-                tracksContainer.appendChild(trackClone);
-                
-                laneDividerScrollOffsets.push(0); 
-                startAreaCurrentX.push(ZERO_POINT_CAR_STATIC_X_START_AREA); 
-                startAreaDisappeared.push(false);
-                trackCurrentSpeeds.push(INITIAL_TRACK_SCROLL_SPEED);
-                trackStripeScrollOffsets.push(0);
-            }
-
-            document.querySelectorAll('.track-container').forEach(trackEl => {
-                trackElements.push(trackEl);
+            // Configurar los eventos de los botones para redirigir a la página de la carrera
+            document.getElementById('cuartos-final-btn').addEventListener('click', () => {
+                // Redirige al archivo copa-warner.cuartos.html
+                window.location.href = 'copa-warner.cuartos.html';
             });
-
-            setCarsAtStartLine(); 
-            startTrafficLightSequence();
-        }
-
-        // ==========================================
-        // POSICIONAR AUTOS
-        // ==========================================
-        function setCarsAtStartLine() {
-            trackElements.forEach((trackEl) => {
-                const carA = trackEl.querySelector('.car-A');
-                const carB = trackEl.querySelector('.car-B'); 
-
-                carA.style.left = `${CAR_BASE_VIEWPORT_X}px`;
-                carB.style.left = `${CAR_BASE_VIEWPORT_X}px`;
-
-                carA.style.display = 'block';
-                carB.style.display = 'block';
+            document.getElementById('semifinal-btn').addEventListener('click', () => {
+                // Redirige al archivo index.html para la simulación
+                window.location.href = 'copa-warner.semifinal.html';
             });
         }
 
-        function setCarsToScorePositions() {
-            trackElements.forEach((trackEl, i) => {
-                const carA = trackEl.querySelector('.car-A');
-                const carB = trackEl.querySelector('.car-B');
-                const pairData = competitionData[i];
-                if (!pairData) return;
-
-                const viewportWidth = trackEl.querySelector('.race-track-viewport').offsetWidth;
-                const carWidth = carA.offsetWidth;
-                CAR_LEAD_RANGE = viewportWidth - CAR_BASE_VIEWPORT_X - carWidth - 10; // 10px de margen al final
-
-                const carAFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente1Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
-                const carBFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente2Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
-
-                carA.style.left = `${Math.min(carAFinalX, viewportWidth - carWidth)}px`;
-                carB.style.left = `${Math.min(carBFinalX, viewportWidth - carWidth)}px`;
-
-                carA.style.display = 'block';
-                carB.style.display = 'block';
-            });
-        }
-
-        function animateCarsToFinalPositions(trackIndex) {
-            const trackEl = trackElements[trackIndex];
-            const carA = trackEl.querySelector('.car-A');
-            const carB = trackEl.querySelector('.car-B');
-            const pairData = competitionData[trackIndex];
-
-            const viewportWidth = trackEl.querySelector('.race-track-viewport').offsetWidth;
-            const carWidth = carA.offsetWidth;
-            CAR_LEAD_RANGE = viewportWidth - CAR_BASE_VIEWPORT_X - carWidth - 10;
-
-            const carAFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente1Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
-            const carBFinalX = CAR_BASE_VIEWPORT_X + (pairData.agente2Puntaje / MAX_SCORE_FOR_VISUAL) * CAR_LEAD_RANGE;
-
-            const startTime = performance.now();
-            const duration = LAUNCH_DURATION_MS;
-            const ease = (t) => 1 - Math.pow(1 - t, 3);
-
-            function moveCars(now) {
-                const elapsed = now - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = ease(progress);
-
-                const currentAX = CAR_BASE_VIEWPORT_X + (carAFinalX - CAR_BASE_VIEWPORT_X) * eased;
-                const currentBX = CAR_BASE_VIEWPORT_X + (carBFinalX - CAR_BASE_VIEWPORT_X) * eased;
-
-                carA.style.left = `${Math.min(currentAX, viewportWidth - carWidth)}px`;
-                carB.style.left = `${Math.min(currentBX, viewportWidth - carWidth)}px`;
-
-                if (progress < 1) {
-                    requestAnimationFrame(moveCars);
-                }
-            }
-            requestAnimationFrame(moveCars);
-        }        
-
-        // ==========================================
-        // BUCLE DE ANIMACIÓN DE LA PISTA
-        // ==========================================
-        function animateRaceLoop(trackIndex) {
-            const trackEl = trackElements[trackIndex];
-            const startArea = trackEl.querySelector('.start-area');
-            const laneDividerVisual = trackEl.querySelector('.lane-divider-visual');
-            const topStripe = trackEl.querySelector('.track-stripe.top-border');
-            const bottomStripe = trackEl.querySelector('.track-stripe.bottom-border');
-
-            function gameLoop() {
-                if (trackCurrentSpeeds[trackIndex] < FINAL_TRACK_SCROLL_SPEED) {
-                    trackCurrentSpeeds[trackIndex] = Math.min(trackCurrentSpeeds[trackIndex] + ACCELERATION_RATE, FINAL_TRACK_SCROLL_SPEED);
-                }
-
-                laneDividerScrollOffsets[trackIndex] = (laneDividerScrollOffsets[trackIndex] - trackCurrentSpeeds[trackIndex]) % LANE_DIVIDER_PATTERN_WIDTH;
-                laneDividerVisual.style.backgroundPositionX = `${laneDividerScrollOffsets[trackIndex]}px`;
-
-                trackStripeScrollOffsets[trackIndex] = (trackStripeScrollOffsets[trackIndex] - trackCurrentSpeeds[trackIndex]) % LANE_DIVIDER_PATTERN_WIDTH;
-                topStripe.style.backgroundPositionX = `${trackStripeScrollOffsets[trackIndex]}px`;
-                bottomStripe.style.backgroundPositionX = `${trackStripeScrollOffsets[trackIndex]}px`;
-
-                if (!startAreaDisappeared[trackIndex]) {
-                    startAreaCurrentX[trackIndex] -= trackCurrentSpeeds[trackIndex];
-                    startArea.style.left = `${startAreaCurrentX[trackIndex]}px`;
-
-                    if (startAreaCurrentX[trackIndex] + startArea.offsetWidth < 0) {
-                        startArea.style.display = 'none';
-                        startAreaDisappeared[trackIndex] = true;
-                    }
-                }
-
-                animationFrameIds[trackIndex] = requestAnimationFrame(gameLoop);
-            }
-            animationFrameIds[trackIndex] = requestAnimationFrame(gameLoop);
-        }
-
-        // ==========================================
-        // SEMÁFORO TIPO F1
-        // ==========================================
-        function startTrafficLightSequence() {
-            trafficLightsElement = document.getElementById('traffic-light');
-            redLightsElements = trafficLightsElement.querySelectorAll('.red-light');
-            greenLightElement = trafficLightsElement.querySelector('.green-light');
-
-            trafficLightsElement.classList.remove('hidden');
-
-            redLightsElements.forEach(light => light.classList.remove('red-on'));
-            greenLightElement.classList.remove('green-on'); 
-
-            lightSequenceIndex = 0;
-
-            lightInterval = setInterval(() => {
-                if (lightSequenceIndex < redLightsElements.length) {
-                    redLightsElements[lightSequenceIndex].classList.add('red-on');
-                    lightSequenceIndex++;
-                } else if (lightSequenceIndex === redLightsElements.length) {
-                    redLightsElements.forEach(light => light.classList.remove('red-on'));
-                    greenLightElement.classList.add('green-on');
-                    lightSequenceIndex++; 
-                    
-                    setTimeout(() => {
-                        trafficLightsElement.classList.add('hidden');
-                        clearInterval(lightInterval);
-
-                        raceStarted = true;
-                        
-                        trackElements.forEach((trackEl, i) => {
-                            const data = competitionData[i];
-                            if (data) {
-                                trackEl.querySelector('.agent-a-score').textContent = data.agente1Puntaje;
-                                trackEl.querySelector('.agent-b-score').textContent = data.agente2Puntaje;
-                            }
-                        });
-
-                        trackElements.forEach((trackEl, i) => {
-                            animateCarsToFinalPositions(i);
-                            animateRaceLoop(i);
-                        });
-                    }, LIGHT_DELAY_MS * 1.5);
-                }
-            }, LIGHT_DELAY_MS);
-        }
-
-        // ==========================================
-        // EVENTOS
-        // ==========================================
-        document.addEventListener('DOMContentLoaded', initializeTracksAndAnimations);
-
-        window.addEventListener('resize', () => {
-            if (!raceStarted) {
-                setCarsAtStartLine();
-            } else {
-                setCarsToScorePositions();
-            }
-        });
+        // Inicia la aplicación al cargar la página
+        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-    <footer style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
-                display: flex; align-items: center; justify-content: center;
-                gap: 8px; font-family: Arial, sans-serif; font-size: 16px; 
-                color: white; z-index: 9999; padding: 8px 12px;">
-        Created by
-        <a href="https://github.com/plgordillovera" target="_blank" 
-        style="display: flex; align-items: center; text-decoration: none; color: #ffffff; font-weight: bold;">
-            <img src="https://github.com/plgordillovera.png" 
-                alt="GitHub Profile" 
-                style="width:32px; height:32px; border-radius:50%; margin-left:5px;">
-        </a>
-    </footer>
-
 </body>
 </html>

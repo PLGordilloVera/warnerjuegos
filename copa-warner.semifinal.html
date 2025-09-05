@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Prix de Datos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ==========================================
+            FUENTES
+            ========================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        .font-arcade {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* ==========================================
+            ESTILOS GENERALES DEL BODY
+            ========================================== */
+        body {
+            background-color: #000 !important;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Evita barras de desplazamiento durante las animaciones */
+        }
+
+        /* ==========================================
+            CARTEL "COPA WARNER"
+            ========================================== */
+        .copa-warner-sign {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 3.5rem;
+            padding: 15px 40px;
+            border-radius: 20px;
+            background-color: #000;
+            border: 5px solid #fff;
+            color: #ff0000;
+            text-shadow: 5px 5px 0 #ffff00;
+            z-index: 10;
+            white-space: nowrap;
+            text-align: center;
+            opacity: 0; /* Inicia oculto */
+            position: relative;
+            transition: opacity 3s ease-in-out; /* Transición para la aparición/desaparición */
+        }
+
+        /* ==========================================
+            PANTALLA DE CARGA (SORTEANDO LLAVES)
+            ========================================== */
+        #sorting-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0; /* Inicia oculto */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #sorting-message {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: #FFD700;
+            text-shadow: 3px 3px 0px #FF0000;
+            text-align: center;
+            padding: 30px 60px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            border: 3px solid #fff;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* ==========================================
+            PANTALLA DE EMPAREJAMIENTOS
+            ========================================== */
+        #matchups-display {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        #matchups-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            color: #FFD700;
+            text-shadow: 3px 3px 0 #FF0000;
+            margin-bottom: 2rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        .matchup-container {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 2.5rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            border: 3px solid #fff;
+            padding: 1rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .player-entry {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 140px; /* Reducido para forzar el salto de línea */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .player-entry h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: #ffff00;
+            text-shadow: 1px 1px 0 #ff0000;
+            margin-top: 0.5rem;
+            width: 100%; /* Asegura que el h2 tome el ancho completo del padre */
+            word-break: break-word; /* Romper palabras para nombres largos */
+            line-height: 1.2; /* Espaciado entre líneas */
+        }
+
+        .player-entry img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+        }
+
+        .vs-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2rem;
+            color: #fff;
+            text-shadow: 2px 2px 0 #00f;
+            margin: 0 20px;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        /* Nuevo estilo para el botón de inicio */
+        #start-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #FFD700;
+            color: #000;
+            padding: 20px 40px;
+            font-size: 2rem;
+            border: 5px solid #FF0000;
+            border-radius: 10px;
+            cursor: pointer;
+            text-shadow: 2px 2px 0 #fff;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: absolute; /* Posición absoluta para colocarlo en el centro de la pantalla */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000; /* Asegura que esté por encima de todo */
+        }
+        
+        #start-button:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <button id="start-button">COMENZAR</button>
+
+    <audio id="semifinal-audio" src="semifinal.mp4" preload="auto" hidden></audio>
+
+    <div class="copa-warner-sign">COPA WARNER</div>
+
+    <div id="sorting-screen">
+        <span id="sorting-message">SORTEANDO LLAVES DE SEMIFINAL</span>
+    </div>
+
+    <div id="matchups-display">
+        <h1 id="matchups-title">DUELOS DE SEMIFINALES</h1>
+        <div id="matchups-list">
+        </div>
+    </div>
+
+    <script>
+        const semifinalistsData = [
+            { name: "ALONSO CASTAÑO", image: "alonso_arcade.png" },
+            { name: "ANDREA VEDIA", image: "andrea_arcade.png" },
+            { name: "LEONELLA PORCEL", image: "leonella_arcade.png" },
+            { name: "MAURO BARRAZA", image: "mauro_arcade.png" }
+        ];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createPlayerEntry(player) {
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'player-entry';
+
+            const imgEl = document.createElement('img');
+            imgEl.src = player.image;
+            imgEl.alt = player.name;
+            imgEl.onerror = () => {
+                console.error(`Error al cargar la imagen para ${player.name}. Asegúrate de que el archivo '${player.image}' está en la misma carpeta que tu archivo HTML.`);
+                imgEl.src = "https://i.ibb.co/VMyhV6C/placeholder-arcade.png";
+            };
+
+            const nameEl = document.createElement('h2');
+            nameEl.textContent = player.name;
+
+            playerDiv.appendChild(imgEl);
+            playerDiv.appendChild(nameEl);
+            return playerDiv;
+        }
+
+        function createVsText() {
+            const vsText = document.createElement('span');
+            vsText.className = 'vs-text';
+            vsText.textContent = 'VS';
+            return vsText;
+        }
+
+        function showMatchupSequence(matchups) {
+            const matchupsList = document.getElementById('matchups-list');
+            matchupsList.innerHTML = '';
+
+            const matchup1 = matchups[0];
+            const matchup2 = matchups[1];
+
+            const matchupContainer1 = document.createElement('div');
+            matchupContainer1.className = 'matchup-container';
+            matchupsList.appendChild(matchupContainer1);
+
+            const matchupContainer2 = document.createElement('div');
+            matchupContainer2.className = 'matchup-container';
+            matchupsList.appendChild(matchupContainer2);
+
+            const player1_1 = createPlayerEntry(matchup1[0]);
+            const vs1 = createVsText();
+            const player1_2 = createPlayerEntry(matchup1[1]);
+            
+            const player2_1 = createPlayerEntry(matchup2[0]);
+            const vs2 = createVsText();
+            const player2_2 = createPlayerEntry(matchup2[1]);
+
+            // 1. Mostrar el título "DUELOS DE SEMIFINALES"
+            const matchupsTitle = document.getElementById('matchups-title');
+            setTimeout(() => {
+                matchupsTitle.style.opacity = '1';
+            }, 500);
+
+            // 2. Mostrar los contenedores de los matchups (cuadros)
+            setTimeout(() => {
+                matchupContainer1.style.opacity = '1';
+                matchupContainer1.style.transform = 'translateY(0)';
+                matchupContainer2.style.opacity = '1';
+                matchupContainer2.style.transform = 'translateY(0)';
+            }, 2000);
+
+            // 3. Mostrar los textos "VS" dentro de los contenedores
+            setTimeout(() => {
+                matchupContainer1.appendChild(vs1);
+                matchupContainer2.appendChild(vs2);
+                setTimeout(() => {
+                    vs1.style.opacity = '1';
+                    vs2.style.opacity = '1';
+                }, 50);
+            }, 3000);
+
+            // 4. Mostrar el primer finalista del VS de arriba
+            setTimeout(() => {
+                matchupContainer1.prepend(player1_1);
+                setTimeout(() => {
+                    player1_1.style.opacity = '1';
+                    player1_1.style.transform = 'translateY(0)';
+                }, 50);
+            }, 5000);
+
+            // 5. Mostrar el primer semifinalista del VS de abajo
+            setTimeout(() => {
+                matchupContainer2.prepend(player2_1);
+                setTimeout(() => {
+                    player2_1.style.opacity = '1';
+                    player2_1.style.transform = 'translateY(0)';
+                }, 50);
+            }, 7000);
+
+            // 6. Mostrar el segundo semifinalista del VS de arriba
+            setTimeout(() => {
+                matchupContainer1.appendChild(player1_2);
+                setTimeout(() => {
+                    player1_2.style.opacity = '1';
+                    player1_2.style.transform = 'translateY(0)';
+                }, 50);
+            }, 9000);
+
+            // 7. Finalmente, mostrar el segundo semifinalista del VS de abajo
+            setTimeout(() => {
+                matchupContainer2.appendChild(player2_2);
+                setTimeout(() => {
+                    player2_2.style.opacity = '1';
+                    player2_2.style.transform = 'translateY(0)';
+                }, 50);
+            }, 11000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const startButton = document.getElementById('start-button');
+            const copaWarnerSign = document.querySelector('.copa-warner-sign');
+            const sortingScreen = document.getElementById('sorting-screen');
+            const matchupsDisplay = document.getElementById('matchups-display');
+            const semifinalAudio = document.getElementById('semifinal-audio');
+
+            // Función que contiene toda la secuencia de animaciones
+            function startSequence() {
+                // Ocultar el botón
+                startButton.style.display = 'none';
+
+                // Reproducir el audio
+                semifinalAudio.play().catch(error => {
+                    console.error('La reproducción del audio falló:', error);
+                    // Opcional: mostrar un mensaje al usuario si el audio no se puede reproducir
+                });
+
+                // 1. Mostrar cartel "COPA WARNER" con transición de 3 segundos
+                setTimeout(() => {
+                    copaWarnerSign.style.opacity = '1';
+                }, 100);
+
+                // 2. Mantener "COPA WARNER" por 2 segundos y luego desvanecerlo
+                setTimeout(() => {
+                    copaWarnerSign.style.opacity = '0';
+                }, 3000);
+
+                // 3. Esperar 1 segundo después de que se desvanezca y mostrar el cartel de sorteo
+                setTimeout(() => {
+                    sortingScreen.style.display = 'flex';
+                    setTimeout(() => {
+                        sortingScreen.style.opacity = '1';
+                    }, 50);
+                }, 6000);
+
+                // 4. Mantener el cartel de sorteo por 5 segundos y luego desvanecerlo
+                setTimeout(() => {
+                    sortingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        sortingScreen.style.display = 'none';
+                        copaWarnerSign.style.display = 'none';
+                        matchupsDisplay.style.display = 'flex';
+                        
+                        const shuffledSemifinalists = shuffleArray([...semifinalistsData]);
+                        const matchups = [
+                            [shuffledSemifinalists[0], shuffledSemifinalists[1]],
+                            [shuffledSemifinalists[2], shuffledSemifinalists[3]]
+                        ];
+                        showMatchupSequence(matchups);
+                    }, 500); // Esperar a que la transición de opacidad termine
+                }, 11000);
+            }
+
+            // Asignar el evento click al botón de inicio
+            startButton.addEventListener('click', startSequence);
+        });
+    </script>
+</body>
+</html>
